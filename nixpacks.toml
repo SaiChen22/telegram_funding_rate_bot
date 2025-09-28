@@ -1,0 +1,12 @@
+[variables]
+PORT = "8000"
+
+[start]
+cmd = "cd telegram_bot && python bot_runner.py"
+
+[build]
+# Install Python dependencies
+cmds = ["pip install -r telegram_bot/requirements.txt"]
+
+[phases.setup]
+nixPkgs = ["python39", "gcc"]

@@ -3,7 +3,8 @@
     "builder": "nixpacks"
   },
   "deploy": {
-    "startCommand": "cd telegram_bot && python main.py",
-    "restartPolicyType": "always"
+    "startCommand": "cd telegram_bot && python bot_runner.py",
+    "restartPolicyType": "always",
+    "region": "europe-west4"
   }
 }

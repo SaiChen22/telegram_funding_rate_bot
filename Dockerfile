@@ -23,4 +23,4 @@ RUN mkdir -p logs
 EXPOSE 8000
 
 # Start the bot
-CMD ["python", "main.py"]
+CMD ["python", "bot_runner.py"]
