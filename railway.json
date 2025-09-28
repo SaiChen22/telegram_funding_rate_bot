@@ -1,0 +1,9 @@
+{
+  "build": {
+    "builder": "nixpacks"
+  },
+  "deploy": {
+    "startCommand": "cd telegram_bot && python main.py",
+    "restartPolicyType": "always"
+  }
+}

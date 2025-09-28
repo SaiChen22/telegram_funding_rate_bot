@@ -1,25 +1,41 @@
 #!/usr/bin/env python3
 """
-Binance Funding Rate Monitor Bot - Fixed for Codespaces
+Binance Funding Rate Monitor Bot - Railway Deployment Ready
 """
 
 import sys
 import logging
 import asyncio
 import nest_asyncio
+import os
 
 # Enable nested event loops
 nest_asyncio.apply()
 
+# Import health server for Railway
+try:
+    from health_server import start_health_server_sync
+    HEALTH_SERVER_AVAILABLE = True
+except ImportError:
+    HEALTH_SERVER_AVAILABLE = False
+
 def setup_logging():
     """Configure basic logging"""
+    # Create logs directory
+    os.makedirs('logs', exist_ok=True)
+    
     logging.basicConfig(
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        level=logging.INFO
+        level=logging.INFO,
+        handlers=[
+            logging.StreamHandler(),
+            logging.FileHandler('logs/funding_bot.log')
+        ]
     )
     # Reduce telegram library noise
     logging.getLogger('httpx').setLevel(logging.WARNING)
     logging.getLogger('telegram').setLevel(logging.WARNING)
+    logging.getLogger('aiohttp').setLevel(logging.WARNING)
 
 async def run_bot():
     """Async function to run the bot"""
@@ -28,6 +44,12 @@ async def run_bot():
     logger = logging.getLogger(__name__)
     
     try:
+        # Start health server for Railway
+        if HEALTH_SERVER_AVAILABLE:
+            health_port = int(os.getenv('PORT', 8000))
+            logger.info(f"Starting health server on port {health_port}")
+            start_health_server_sync(health_port)
+        
         # Validate configuration
         from config import Config
         config = Config()
