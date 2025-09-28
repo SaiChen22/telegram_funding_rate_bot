@@ -5,6 +5,6 @@
   "deploy": {
     "startCommand": "python bot_runner.py",
     "restartPolicyType": "always",
-    "region": "europe-west4"
+    "region": "europe-west4-drams3a"
   }
 }
