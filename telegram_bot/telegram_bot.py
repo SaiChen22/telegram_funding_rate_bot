@@ -379,7 +379,7 @@ class FundingRateBot:
     async def run(self):
         """Start the bot"""
         logger.info("Starting Funding Rate Bot...")
-        await self.application.run_polling()
+        await self.application.run_polling(close_loop=False)
 
 if __name__ == "__main__":
     import sys
