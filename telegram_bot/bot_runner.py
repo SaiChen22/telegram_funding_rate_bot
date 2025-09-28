@@ -66,6 +66,7 @@ async def run_bot():
         
         # Run the bot
         await bot.run()
+        return 0
         
     except ValueError as e:
         logger.error(f"Configuration error: {e}")
@@ -85,19 +86,8 @@ def main():
     setup_logging()
     
     try:
-        # Try to run with existing event loop
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                # If loop is already running, create a task
-                task = loop.create_task(run_bot())
-                return 0
-            else:
-                # If no loop is running, use asyncio.run
-                return asyncio.run(run_bot())
-        except RuntimeError:
-            # No event loop, create one
-            return asyncio.run(run_bot())
+        # Use asyncio.run for clean event loop management
+        return asyncio.run(run_bot())
             
     except KeyboardInterrupt:
         print("\n👋 Bot stopped by user")
