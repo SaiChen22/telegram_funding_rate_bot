@@ -1,0 +1,89 @@
+#!/usr/bin/env python3
+"""
+Binance Funding Rate Monitor Bot - Fixed for Codespaces
+"""
+
+import sys
+import logging
+import asyncio
+import nest_asyncio
+
+# Enable nested event loops
+nest_asyncio.apply()
+
+def setup_logging():
+    """Configure basic logging"""
+    logging.basicConfig(
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        level=logging.INFO
+    )
+    # Reduce telegram library noise
+    logging.getLogger('httpx').setLevel(logging.WARNING)
+    logging.getLogger('telegram').setLevel(logging.WARNING)
+
+async def run_bot():
+    """Async function to run the bot"""
+    from telegram_bot import FundingRateBot
+    
+    logger = logging.getLogger(__name__)
+    
+    try:
+        # Validate configuration
+        from config import Config
+        config = Config()
+        config.validate()
+        logger.info("Configuration validated successfully")
+        logger.info(f"Upper threshold: {config.UPPER_THRESHOLD}%")
+        logger.info(f"Lower threshold: {config.LOWER_THRESHOLD}%")
+        logger.info(f"Check interval: {config.CHECK_INTERVAL}s")
+        
+        # Create and run bot
+        bot = FundingRateBot()
+        logger.info("Bot initialized successfully")
+        logger.info("Starting bot polling...")
+        
+        # Run the bot
+        await bot.run()
+        
+    except ValueError as e:
+        logger.error(f"Configuration error: {e}")
+        print(f"❌ Configuration error: {e}")
+        print("Please check your .env file")
+        return 1
+    except Exception as e:
+        logger.error(f"Bot error: {e}", exc_info=True)
+        print(f"❌ Error: {e}")
+        return 1
+
+def main():
+    """Main function"""
+    print("🚀 Starting Binance Funding Rate Monitor Bot...")
+    print("Press Ctrl+C to stop the bot")
+    
+    setup_logging()
+    
+    try:
+        # Try to run with existing event loop
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                # If loop is already running, create a task
+                task = loop.create_task(run_bot())
+                return 0
+            else:
+                # If no loop is running, use asyncio.run
+                return asyncio.run(run_bot())
+        except RuntimeError:
+            # No event loop, create one
+            return asyncio.run(run_bot())
+            
+    except KeyboardInterrupt:
+        print("\n👋 Bot stopped by user")
+        return 0
+    except Exception as e:
+        print(f"❌ Fatal error: {e}")
+        return 1
+
+if __name__ == "__main__":
+    exit_code = main()
+    sys.exit(exit_code)
